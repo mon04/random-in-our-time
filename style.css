@@ -50,14 +50,14 @@ body {
     }
 
     .episode h2 {
-        font-size: 2em;
+        font-size: 3em;
     }
 
     .episode p {
-        font-size: 1.2em;
+        font-size: 2em;
     }
 
     .pub-date {
-        font-size: 1em;
+        font-size: 1.7em;
     }
 }
