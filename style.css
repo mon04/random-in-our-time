@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+#episode-container {
+    padding: 20px;
+}
+
+.episode {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.episode h2 {
+    margin: 0 0 10px;
+    font-size: 1.5em;
+}
+
+.episode h2 a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.episode h2 a:hover {
+    text-decoration: underline;
+}
+
+.episode p {
+    margin: 10px 0;
+}
+
+.pub-date {
+    color: #6c757d;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .episode {
+        padding: 10px;
+    }
+
+    .episode h2 {
+        font-size: 1.2em;
+    }
+
+    .episode p {
+        font-size: 0.9em;
+    }
+}
