@@ -41,17 +41,15 @@ function episodeElement(episode) {
     titleElement.appendChild(titleLink);
     episodeDiv.appendChild(titleElement);
 
-    const subtitleElement = document.createElement('p');
-    subtitleElement.textContent = episode.subtitle || 'No subtitle available';
-    episodeDiv.appendChild(subtitleElement);
-
     const pubDateElement = document.createElement('p');
     pubDateElement.className = 'pub-date';
     pubDateElement.textContent = (
-        `Published on: ${
-            episode.pubDate.toLocaleDateString() || 'No date available'
-        }`)
+        episode.pubDate.toLocaleDateString() || 'No date available')
     episodeDiv.appendChild(pubDateElement);
+    
+    const subtitleElement = document.createElement('p');
+    subtitleElement.textContent = episode.subtitle || 'No subtitle available';
+    episodeDiv.appendChild(subtitleElement);
 
     return episodeDiv.outerHTML;
 }
