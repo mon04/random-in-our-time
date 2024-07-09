@@ -29,26 +29,22 @@ async function getRandomEpisode() {
 }
 
 function episodeElement(episode) {
-    // Create a container div for the episode
     const episodeDiv = document.createElement('div');
     episodeDiv.className = 'episode';
 
-    // Create and append the title element as a link
     const titleLink = document.createElement('a');
     titleLink.href = episode.link || '#';
     titleLink.textContent = episode.title || 'No title available';
-    titleLink.target = '_blank'; // Open link in a new tab
+    titleLink.target = '_blank';
 
     const titleElement = document.createElement('h2');
     titleElement.appendChild(titleLink);
     episodeDiv.appendChild(titleElement);
 
-    // Create and append the subtitle element
     const subtitleElement = document.createElement('p');
     subtitleElement.textContent = episode.subtitle || 'No subtitle available';
     episodeDiv.appendChild(subtitleElement);
 
-    // Create and append the pubDate element
     const pubDateElement = document.createElement('p');
     pubDateElement.className = 'pub-date';
     pubDateElement.textContent = (
