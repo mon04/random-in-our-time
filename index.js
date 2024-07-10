@@ -52,7 +52,7 @@ function episodeAsElement(episode) {
             : 'No date available');
     episodeDiv.appendChild(pubDateElement);
 
-    const subtitleElement = createElement('p', null, 
+    const subtitleElement = createElement('p', 'subtitle', 
         episode.subtitle || 'No subtitle available');
     episodeDiv.appendChild(subtitleElement);
 
