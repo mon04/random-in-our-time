@@ -1,11 +1,12 @@
 const RSS_URL = "https://podcasts.files.bbci.co.uk/b006qykl.rss"
 
 class Episode {
-    constructor(title, subtitle, pubDate, link) {
+    constructor(title, subtitle, pubDate, link, episodeNum) {
         this.title = title;
         this.subtitle = subtitle;
         this.pubDate = pubDate;
         this.link = link;
+        this.episodeNum = episodeNum;
     }
 }
 
@@ -17,14 +18,16 @@ async function getRandomEpisode() {
     )
 
     const items = data.querySelectorAll("item")
-    const item = items[Math.floor(Math.random() * items.length)]
+    const randomIndex = Math.floor(Math.random() * items.length)
+    const item = items[randomIndex]
 
     const title = item.querySelector("title")?.innerHTML
     const subtitle = item.querySelector("subtitle")?.innerHTML
     const pubDate = new Date(item.querySelector("pubDate")?.innerHTML)
     const link = item.querySelector("link")?.innerHTML
+    const episodeNum = items.length - randomIndex
 
-    episode = new Episode(title, subtitle, pubDate, link)
+    episode = new Episode(title, subtitle, pubDate, link, episodeNum)
     return episode
 }
 
@@ -34,7 +37,7 @@ function episodeElement(episode) {
 
     const titleLink = document.createElement('a');
     titleLink.href = episode.link || '#';
-    titleLink.textContent = episode.title || 'No title available';
+    titleLink.textContent = (episode.episodeNum + ". " + episode.title) || 'No title available';
     titleLink.target = '_blank';
 
     const titleElement = document.createElement('h2');
