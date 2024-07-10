@@ -14,55 +14,61 @@ async function getRandomEpisode() {
     const response = await fetch(RSS_URL)
     const rssText = await response.text()
     const data = (
-        new window.DOMParser().parseFromString(rssText, "text/xml")
-    )
+        new window.DOMParser().parseFromString(rssText, "text/xml"))
 
     const items = data.querySelectorAll("item")
+    
     const randomIndex = Math.floor(Math.random() * items.length)
     const item = items[randomIndex]
-
-    const title = item.querySelector("title")?.innerHTML
-    const subtitle = item.querySelector("subtitle")?.innerHTML
-    const pubDate = new Date(item.querySelector("pubDate")?.innerHTML)
-    const link = item.querySelector("link")?.innerHTML
     const episodeNum = items.length - randomIndex
 
-    episode = new Episode(title, subtitle, pubDate, link, episodeNum)
-    return episode
+    const title = getElementContent(item, "title")
+    const subtitle = getElementContent(item, "subtitle")
+    const pubDate = new Date(getElementContent(item, "pubDate"))
+    const link = getElementContent(item, "link")
+
+    return new Episode(title, subtitle, pubDate, link, episodeNum)
 }
 
-function episodeElement(episode) {
-    const episodeDiv = document.createElement('div');
-    episodeDiv.className = 'episode';
+function getElementContent(element, tag) {
+    return element.querySelector(tag)?.innerHTML || '';
+}
 
-    const titleLink = document.createElement('a');
+function episodeAsElement(episode) {
+    const episodeDiv = createElement('div', 'episode');
+
+    const titleLink = createElement('a', null, 
+        `${episode.episodeNum}. ${episode.title || 'No title available'}`);
     titleLink.href = episode.link || '#';
-    titleLink.textContent = (episode.episodeNum + ". " + episode.title) || 'No title available';
     titleLink.target = '_blank';
 
-    const titleElement = document.createElement('h2');
+    const titleElement = createElement('h2');
     titleElement.appendChild(titleLink);
     episodeDiv.appendChild(titleElement);
 
-    const pubDateElement = document.createElement('p');
-    pubDateElement.className = 'pub-date';
-    pubDateElement.textContent = (
-        episode.pubDate.toLocaleDateString() || 'No date available')
+    const pubDateElement = createElement('p', 'pub-date', 
+        episode.pubDate
+            ? episode.pubDate.toLocaleDateString()
+            : 'No date available');
     episodeDiv.appendChild(pubDateElement);
-    
-    const subtitleElement = document.createElement('p');
-    subtitleElement.textContent = episode.subtitle || 'No subtitle available';
+
+    const subtitleElement = createElement('p', null, 
+        episode.subtitle || 'No subtitle available');
     episodeDiv.appendChild(subtitleElement);
 
     return episodeDiv.outerHTML;
 }
 
-
-episode = getRandomEpisode()
+function createElement(tag, className, content) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (content) element.textContent = content;
+    return element;
+}
 
 getRandomEpisode().then(episode => {
     document.getElementById("episode-container").innerHTML = (
-        episodeElement(episode));
+        episodeAsElement(episode));
 }).catch(error => {
     console.error("Failed to render episode:", error);
 });
