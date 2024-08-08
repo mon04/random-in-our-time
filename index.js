@@ -105,8 +105,6 @@ async function main() {
         sessionStorage.setItem("episodesCache", JSON.stringify(episodes));
     }
 
-    console.log("episodes:", episodes)
-
     const i = Math.floor(Math.random() * episodes.length);
     const suggestedEp = episodes[i];
 
