@@ -1,5 +1,6 @@
 const RSS_URL = "https://podcasts.files.bbci.co.uk/b006qykl.rss"
 
+
 class Episode {
     constructor(title, subtitle, pubDate, link, episodeNum) {
         this.title = title;
@@ -10,54 +11,53 @@ class Episode {
     }
 }
 
-async function getRandomEpisode() {
-    const response = await fetch(RSS_URL)
-    const rssText = await response.text()
-    const data = (
-        new window.DOMParser().parseFromString(rssText, "text/xml"))
 
-    const items = data.querySelectorAll("item")
+async function downloadRss(url) {
+    try {
+        const response = await fetch(url);
+        const rssText = await response.text();
+        return new window.DOMParser().parseFromString(rssText, "text/xml");
+    } catch (error) {
+        console.error("Error fetching RSS:", error);
+        throw error;
+    }
+}
+
+
+function itemAsEpisode(item, episodeNum) {
+
+    const title = item.querySelector("title")?.innerHTML
+    const subtitle = item.querySelector("subtitle")?.innerHTML
+    const pubDate = new Date(item.querySelector("pubDate")?.innerHTML)
+    const link = item.querySelector("link")
     
-    const randomIndex = Math.floor(Math.random() * items.length)
-    const item = items[randomIndex]
-    const episodeNum = items.length - randomIndex
-
-    const title = getElementContent(item, "title")
-    const subtitle = getElementContent(item, "subtitle")
-    const pubDate = new Date(getElementContent(item, "pubDate"))
-    const link = getElementContent(item, "link")
-
     return new Episode(title, subtitle, pubDate, link, episodeNum)
 }
 
-function getElementContent(element, tag) {
-    return element.querySelector(tag)?.innerHTML || '';
-}
 
-function episodeAsElement(episode) {
-    const episodeDiv = createElement('div', 'episode');
+function episodeAsCard(episode) {
+    const card = createElement('div', 'episode');
 
-    const titleLink = createElement('a', null, 
-        `${episode.episodeNum}. ${episode.title || 'No title available'}`);
-    titleLink.href = episode.link || '#';
+    const titleLink = createElement(
+        'a', null, `${episode.episodeNum}. ${episode.title}`);
+
+    titleLink.href = episode.link;
     titleLink.target = '_blank';
 
-    const titleElement = createElement('h2');
-    titleElement.appendChild(titleLink);
-    episodeDiv.appendChild(titleElement);
+    const title = createElement('h2');
+    title.appendChild(titleLink);
+    card.appendChild(title);
 
-    const pubDateElement = createElement('p', 'pub-date', 
-        episode.pubDate
-            ? episode.pubDate.toLocaleDateString()
-            : 'No date available');
-    episodeDiv.appendChild(pubDateElement);
+    const pubDate = createElement(
+        'p', 'pub-date', episode.pubDate.toLocaleDateString())
+    card.appendChild(pubDate);
 
-    const subtitleElement = createElement('p', 'subtitle', 
-        episode.subtitle || 'No subtitle available');
-    episodeDiv.appendChild(subtitleElement);
+    const subtitle = createElement('p', 'subtitle',  episode.subtitle);
+    card.appendChild(subtitle);
 
-    return episodeDiv.outerHTML;
+    return card.outerHTML;
 }
+
 
 function createElement(tag, className, content) {
     const element = document.createElement(tag);
@@ -66,9 +66,53 @@ function createElement(tag, className, content) {
     return element;
 }
 
-getRandomEpisode().then(episode => {
-    document.getElementById("episode-container").innerHTML = (
-        episodeAsElement(episode));
-}).catch(error => {
-    console.error("Failed to render episode:", error);
-});
+
+function parseEpisodes(json) {
+    return JSON.parse(json, (key, value) => {
+        if (key === "pubDate") {
+            return new Date(value);
+        }
+        return value;
+    }).map(item => Object.assign(new Episode(), item));
+}
+
+
+
+async function main() {
+    
+    let episodes = []
+
+    json = sessionStorage.getItem("episodesCache")
+
+    if (json) {
+
+        console.log("Cache found")
+        episodes = parseEpisodes(json)
+        
+    } else {
+
+        console.log("Cache not found")
+
+        const rss = await downloadRss(RSS_URL);
+        const items = rss.querySelectorAll("item");
+        const n = items.length;
+
+        for (let i = 0; i < n; i++) {
+            const ep = itemAsEpisode(items[i], (n - i));
+            episodes.push(ep);
+        }
+
+        sessionStorage.setItem("episodesCache", JSON.stringify(episodes));
+    }
+
+    console.log("episodes:", episodes)
+
+    const i = Math.floor(Math.random() * episodes.length);
+    const suggestedEp = episodes[i];
+
+    document
+        .getElementById("episode-container")
+        .innerHTML = (episodeAsCard(suggestedEp));
+}
+
+main();
