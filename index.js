@@ -29,7 +29,7 @@ function itemAsEpisode(item, episodeNum) {
     const title = item.querySelector("title")?.innerHTML
     const subtitle = item.querySelector("subtitle")?.innerHTML
     const pubDate = new Date(item.querySelector("pubDate")?.innerHTML)
-    const link = item.querySelector("link")
+    const link = item.querySelector("link")?.innerHTML
     
     return new Episode(title, subtitle, pubDate, link, episodeNum)
 }
@@ -79,7 +79,7 @@ function parseEpisodes(json) {
 
 
 async function main() {
-    
+
     let episodes = []
 
     json = sessionStorage.getItem("episodesCache")
